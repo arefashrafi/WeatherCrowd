@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WeatherCrowd</string>
+    <string name="temperature">Temperature</string>
+    <string name="get_location">Get Location</string>
+    <string name="locationTextView">TextView</string>
+    <string name="submit_location_temp">Submit</string>
+</resources>
