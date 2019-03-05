@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "929448663926",
+    "firebase_url": "https://weathercrowd-1551273901728.firebaseio.com",
+    "project_id": "weathercrowd-1551273901728",
+    "storage_bucket": "weathercrowd-1551273901728.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929448663926:android:20e2fca29224e172",
+        "android_client_info": {
+          "package_name": "com.example.weathercrowd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "929448663926-uvgq8dcdsc3j2pravo88kcpe5lusfm2u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.weathercrowd",
+            "certificate_hash": "802f5860adff71f98572414a25c055dc95b4060b"
+          }
+        },
+        {
+          "client_id": "929448663926-itngftfu2n0aligd6ljskbfl8jl3c538.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOIti4x36XeHl-MqpzuXu3-RF0j91uPNc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "929448663926-itngftfu2n0aligd6ljskbfl8jl3c538.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

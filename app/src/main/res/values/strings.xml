@@ -1,7 +1,16 @@
 <resources>
     <string name="app_name">WeatherCrowd</string>
-    <string name="temperature">Temperature</string>
     <string name="get_location">Get Location</string>
     <string name="locationTextView">TextView</string>
     <string name="submit_location_temp">Submit</string>
+    <string name="sign_out">Sign out</string>
+    <string name="profilePicture">profilePicture</string>
+    <string name="enter_temperature">Enter Temperature</string>
+    <string name="mapbox_access_token">sk.eyJ1IjoiYXJlZmFzaHJhZmkiLCJhIjoiY2pzdWgzbTliMTE5bzQzcXptbHd1dGljdiJ9.6VMvQt-vlqODyAv-pOmXOQ</string>
+    <string name="add_temperatureMenu">Add Temperature</string>
+    <string name="view_heat_map_menu">View Heat Map</string>
+    <string name="account_menu">Account</string>
+    <string name="welcome_to_weather_crowd">Welcome To Weather Crowd</string>
+    <string name="sign_in_main">Sign In</string>
+    <string name="historyMenuText">History</string>
 </resources>

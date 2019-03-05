@@ -1,4 +1,4 @@
-package com.example.weathercrowd;
+package com.example.weathercrowd.Misc;
 
 import android.app.Service;
 import android.content.Context;

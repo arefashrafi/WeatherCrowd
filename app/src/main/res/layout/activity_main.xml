@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="405dp"
+        android:layout_height="138dp"
+        android:layout_marginTop="104dp"
+        android:layout_marginBottom="490dp"
+        android:fontFamily="monospace"
+        android:text="@string/welcome_to_weather_crowd"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/signInButtonMain"
+        style="@style/FirebaseUI.Button.AccountChooser"
+        android:layout_width="196dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="107dp"
+        android:layout_marginTop="261dp"
+        android:layout_marginEnd="108dp"
+        android:layout_marginBottom="176dp"
+        android:fontFamily="serif-monospace"
+        android:onClick="SignInButton"
+        android:text="@string/sign_in_main"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <Button
+        android:id="@+id/button2"
+        style="@style/FirebaseUI.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="161dp"
+        android:layout_marginTop="69dp"
+        android:layout_marginEnd="162dp"
+        android:layout_marginBottom="144dp"
+        android:fontFamily="serif-monospace"
+        android:onClick="ViewHeatMap"
+        android:text="Map"
+        app:layout_constraintBottom_toTopOf="@+id/signInButtonMain"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+</android.support.constraint.ConstraintLayout>

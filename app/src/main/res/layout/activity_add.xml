@@ -6,9 +6,11 @@
 
     <Button
         android:id="@+id/location__button"
+        style="@style/FirebaseUI.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="75dp"
+        android:fontFamily="monospace"
         android:onClick="getLocation"
         android:text="@string/get_location"
         app:layout_constraintBottom_toTopOf="@+id/locationTextView"
@@ -24,6 +26,7 @@
         android:layout_marginTop="56dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="44dp"
+        android:hint="@string/enter_temperature"
         app:layout_constraintBottom_toTopOf="@+id/location__button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,7 +35,9 @@
         <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/temperature" />
+            android:fontFamily="monospace"
+            android:hint="@string/enter_temperature"
+            android:inputType="number" />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -41,7 +46,8 @@
         android:layout_width="181dp"
         android:layout_height="0dp"
         android:layout_marginBottom="119dp"
-        android:text="@string/locationTextView"
+        android:fontFamily="casual"
+        android:textAlignment="viewStart"
         app:layout_constraintBottom_toTopOf="@+id/submit_data"
         app:layout_constraintEnd_toEndOf="@+id/location__button"
         app:layout_constraintStart_toStartOf="@+id/location__button"
@@ -49,11 +55,14 @@
 
     <Button
         android:id="@+id/submit_data"
+        style="@style/FirebaseUI.Button.AccountChooser.TwitterButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="214dp"
-        android:onClick="submit_data"
+        android:fontFamily="monospace"
+        android:onClick="submitButtonPressed"
         android:text="@string/submit_location_temp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/locationTextView"
         app:layout_constraintStart_toStartOf="@+id/locationTextView"

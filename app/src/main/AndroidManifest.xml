@@ -13,13 +13,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AddActivity">
+        <activity
+            android:name=".Activities.AddActivity"
+            android:parentActivityName=".Activities.MenuActivity" />
+        <activity
+            android:name=".Activities.UserInfoActivity"
+            android:parentActivityName=".Activities.MenuActivity" />
+        <activity
+            android:name=".Activities.HeatmapActivity"
+            android:parentActivityName=".Activities.MenuActivity" />
+        <activity android:name=".Activities.MenuActivity" />
+        <activity android:name=".Activities.SignInActivity" />
+        <activity
+            android:name=".Activities.HistoryActivity"
+            android:parentActivityName=".Activities.MenuActivity" />
+        <activity android:name=".Activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
 
     </application>
 

@@ -1,4 +1,4 @@
-package com.example.weathercrowd;
+package com.example.weathercrowd.Misc;
 
 import java.util.Date;
 
@@ -25,6 +25,19 @@ public class GpsPosition {
     public void setTime(Date time) {
         this.time = time;
     }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
 
     @Override
     public String toString() {
