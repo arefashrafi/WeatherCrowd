@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "929448663926-tciq80n5dabu0gteedoep95h48qlr49v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.weathercrowd",
+            "certificate_hash": "5c23964bb4cdea9d9620ae1aeb1af50fd34eb5d5"
+          }
+        },
+        {
           "client_id": "929448663926-itngftfu2n0aligd6ljskbfl8jl3c538.apps.googleusercontent.com",
           "client_type": 3
         }

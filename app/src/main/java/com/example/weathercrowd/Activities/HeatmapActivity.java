@@ -1,6 +1,5 @@
 package com.example.weathercrowd.Activities;
 
-//Yes
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +12,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import java.net.MalformedURLException;
@@ -39,6 +40,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapRadius;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapWeight;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 public class HeatmapActivity extends AppCompatActivity {
 
@@ -47,6 +49,7 @@ public class HeatmapActivity extends AppCompatActivity {
     private static final String HEATMAP_LAYER_ID = "earthquakes-heat";
     private static final String HEATMAP_LAYER_SOURCE = "earthquakes";
     private static final String CIRCLE_LAYER_ID = "earthquakes-circle";
+    private static final String TEMPERATURE_LAYER_ID = "temperature";
 
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -66,24 +69,46 @@ public class HeatmapActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 HeatmapActivity.this.mapboxMap = mapboxMap;
-                mapboxMap.setStyle(Style.LIGHT, new Style.OnStyleLoaded() {
+                mapboxMap.setStyle(Style.DARK, new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
-                        addEarthquakeSource(style);
+                        addTemperatureSource(style);
                         addHeatmapLayer(style);
                         addCircleLayer(style);
+                        addTemperatureLayer(style);
                     }
                 });
             }
         });
     }
 
-    private void addEarthquakeSource(@NonNull Style loadedMapStyle) {
+    private void addTemperatureSource(@NonNull Style loadedMapStyle) {
         try {
             loadedMapStyle.addSource(new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URL(EARTHQUAKE_SOURCE_URL)));
         } catch (MalformedURLException malformedUrlException) {
             Timber.e(malformedUrlException, "That's not an url... ");
         }
+    }
+
+    private void addTemperatureLayer(@NonNull Style loadedMapStyle) {
+
+        SymbolLayer symbolLayer = new SymbolLayer(TEMPERATURE_LAYER_ID, EARTHQUAKE_SOURCE_ID);
+        symbolLayer.withProperties(
+                PropertyFactory.textField(get("mag")),
+                PropertyFactory.textColor("white"),
+                PropertyFactory.textAllowOverlap(true)
+        );
+        symbolLayer.setProperties(
+                textSize(
+                        interpolate(
+                                linear(), zoom(),
+                                stop(0, 2),
+                                stop(8, 1)
+                        )
+                )
+
+        );
+        loadedMapStyle.addLayer(symbolLayer);
     }
 
     private void addHeatmapLayer(@NonNull Style loadedMapStyle) {

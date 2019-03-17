@@ -1,51 +1,47 @@
 package com.example.weathercrowd.Activities;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.weathercrowd.R;
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.firebase.ui.database.FirebaseListOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class HistoryActivity extends AppCompatActivity {
 
-    String countryList[] = {"India", "China", "australia", "Portugle", "America", "NewZealand"};
-    private DatabaseReference mDatabase;
-    private FirebaseUser mUser;
+    private FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_history);
-        setupListView();
-    }
+        mListView = findViewById(R.id.userHistory);
 
-    private void getUserHistory() {
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.orderByChild("userId").equalTo(mUser.getUid());
-    }
 
-    // Get data from DB then take the ID of entry and send it to the next activity and update it as you see fit.
-    private void setupListView() {
-        ArrayAdapter adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, countryList);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(mUser.getUid());
+        FirebaseListOptions<String> options = new FirebaseListOptions.Builder<String>()
+                .setQuery(databaseReference, String.class)
+                .setLayout(android.R.layout.simple_list_item_1)
+                .build();
 
-        ListView listView = findViewById(R.id.userHistory);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        FirebaseListAdapter<String> adapter = new FirebaseListAdapter<String>(options) {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(HistoryActivity.this, EditHistoryActivity.class);
-                intent.putExtra("itemIndex", parent.getSelectedItemPosition());
-                startActivity(intent);
+            protected void populateView(@NonNull View v, @NonNull String model, int position) {
+                TextView textView = v.findViewById(android.R.id.text1);
+                textView.setText(model);
             }
-        });
+        };
+        mListView.setAdapter(adapter);
     }
+
 }
 

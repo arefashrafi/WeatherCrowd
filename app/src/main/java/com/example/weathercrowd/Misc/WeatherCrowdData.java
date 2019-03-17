@@ -1,14 +1,14 @@
 package com.example.weathercrowd.Misc;
 
-public class WeatherCrowdData {
-    private GpsPosition gpsPosition;
-    private Double temperature;
-    private String userId;
+import android.location.Location;
 
-    public WeatherCrowdData(GpsPosition gpsPosition, Double temperature, String userId) {
-        this.gpsPosition = gpsPosition;
+public class WeatherCrowdData {
+    private Location location;
+    private Double temperature;
+
+    public WeatherCrowdData(Location location, Double temperature) {
+        this.location = location;
         this.temperature = temperature;
-        this.userId = userId;
     }
 
     public Double getTemperature() {
@@ -19,19 +19,12 @@ public class WeatherCrowdData {
         this.temperature = temperature;
     }
 
-    public GpsPosition getGpsPosition() {
-        return gpsPosition;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setGpsPosition(GpsPosition gpsPosition) {
-        this.gpsPosition = gpsPosition;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 }
