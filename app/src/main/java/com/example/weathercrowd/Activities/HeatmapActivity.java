@@ -40,7 +40,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapRadius;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapWeight;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOpacity;
 
 public class HeatmapActivity extends AppCompatActivity {
 
@@ -99,11 +99,11 @@ public class HeatmapActivity extends AppCompatActivity {
                 PropertyFactory.textAllowOverlap(true)
         );
         symbolLayer.setProperties(
-                textSize(
+                textOpacity(
                         interpolate(
                                 linear(), zoom(),
-                                stop(0, 2),
-                                stop(8, 1)
+                                stop(2, 0),
+                                stop(5, 1)
                         )
                 )
 
