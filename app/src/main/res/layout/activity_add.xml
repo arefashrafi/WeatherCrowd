@@ -9,13 +9,13 @@
         style="@style/FirebaseUI.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="75dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginBottom="68dp"
         android:fontFamily="monospace"
         android:onClick="getLocation"
         android:text="@string/get_location"
         app:layout_constraintBottom_toTopOf="@+id/locationTextView"
-        app:layout_constraintEnd_toEndOf="@+id/temperatureInput"
-        app:layout_constraintStart_toStartOf="@+id/temperatureInput"
+        app:layout_constraintEnd_toEndOf="@+id/locationTextView"
         app:layout_constraintTop_toBottomOf="@+id/temperatureInput" />
 
     <android.support.design.widget.TextInputLayout
@@ -23,16 +23,19 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="5dp"
-        android:layout_marginBottom="168dp"
+        android:layout_marginBottom="27dp"
         android:hint="@string/enter_temperature"
-        app:layout_constraintBottom_toTopOf="@+id/locationTextView"
+        app:counterEnabled="true"
+        app:counterMaxLength="5"
+        app:layout_constraintBottom_toTopOf="@+id/location__button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <android.support.design.widget.TextInputEditText
+            android:id="@+id/testedit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
@@ -45,27 +48,27 @@
         android:id="@+id/locationTextView"
         android:layout_width="181dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="392dp"
+        android:layout_marginBottom="47dp"
         android:fontFamily="casual"
         android:textAlignment="viewStart"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/submit_data"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/temperatureInput" />
+        app:layout_constraintTop_toBottomOf="@+id/location__button" />
 
     <Button
         android:id="@+id/submit_data"
         style="@style/FirebaseUI.Button.AccountChooser.TwitterButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="214dp"
+        android:layout_marginBottom="265dp"
         android:fontFamily="monospace"
         android:onClick="submitButtonPressed"
         android:text="@string/submit_location_temp"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/locationTextView"
-        app:layout_constraintStart_toStartOf="@+id/locationTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/locationTextView" />
 
 </android.support.constraint.ConstraintLayout>

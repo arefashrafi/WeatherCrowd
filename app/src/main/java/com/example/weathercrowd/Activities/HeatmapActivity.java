@@ -44,11 +44,10 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOpacity;
 
 public class HeatmapActivity extends AppCompatActivity {
 
-    private static final String EARTHQUAKE_SOURCE_URL = "https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson";
-    private static final String EARTHQUAKE_SOURCE_ID = "earthquakes";
-    private static final String HEATMAP_LAYER_ID = "earthquakes-heat";
-    private static final String HEATMAP_LAYER_SOURCE = "earthquakes";
-    private static final String CIRCLE_LAYER_ID = "earthquakes-circle";
+    private static final String TEMPERATURE_SOURCE_ID = "temperatures";
+    private static final String HEATMAP_LAYER_ID = "temperatures-heat";
+    private static final String HEATMAP_LAYER_SOURCE = "temperatures";
+    private static final String CIRCLE_LAYER_ID = "temperatures-circle";
     private static final String TEMPERATURE_LAYER_ID = "temperature";
 
     private MapView mapView;
@@ -84,7 +83,7 @@ public class HeatmapActivity extends AppCompatActivity {
 
     private void addTemperatureSource(@NonNull Style loadedMapStyle) {
         try {
-            loadedMapStyle.addSource(new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URL(EARTHQUAKE_SOURCE_URL)));
+            loadedMapStyle.addSource(new GeoJsonSource(TEMPERATURE_SOURCE_ID, new URL(getString(R.string.firebase_temp_data_source))));
         } catch (MalformedURLException malformedUrlException) {
             Timber.e(malformedUrlException, "That's not an url... ");
         }
@@ -92,7 +91,7 @@ public class HeatmapActivity extends AppCompatActivity {
 
     private void addTemperatureLayer(@NonNull Style loadedMapStyle) {
 
-        SymbolLayer symbolLayer = new SymbolLayer(TEMPERATURE_LAYER_ID, EARTHQUAKE_SOURCE_ID);
+        SymbolLayer symbolLayer = new SymbolLayer(TEMPERATURE_LAYER_ID, TEMPERATURE_SOURCE_ID);
         symbolLayer.withProperties(
                 PropertyFactory.textField(get("mag")),
                 PropertyFactory.textColor("white"),
@@ -112,7 +111,7 @@ public class HeatmapActivity extends AppCompatActivity {
     }
 
     private void addHeatmapLayer(@NonNull Style loadedMapStyle) {
-        HeatmapLayer layer = new HeatmapLayer(HEATMAP_LAYER_ID, EARTHQUAKE_SOURCE_ID);
+        HeatmapLayer layer = new HeatmapLayer(HEATMAP_LAYER_ID, TEMPERATURE_SOURCE_ID);
         layer.setMaxZoom(9);
         layer.setSourceLayer(HEATMAP_LAYER_SOURCE);
         layer.setProperties(
@@ -174,7 +173,7 @@ public class HeatmapActivity extends AppCompatActivity {
     }
 
     private void addCircleLayer(@NonNull Style loadedMapStyle) {
-        CircleLayer circleLayer = new CircleLayer(CIRCLE_LAYER_ID, EARTHQUAKE_SOURCE_ID);
+        CircleLayer circleLayer = new CircleLayer(CIRCLE_LAYER_ID, TEMPERATURE_SOURCE_ID);
         circleLayer.setProperties(
 
 // Size circle radius by earthquake magnitude and zoom level

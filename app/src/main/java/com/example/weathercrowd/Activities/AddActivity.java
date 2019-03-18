@@ -37,7 +37,7 @@ public class AddActivity extends AppCompatActivity {
     WeatherCrowdData weatherCrowdData;
     private DatabaseReference mDatabase;
     EditText editTemperature;
-    List<Address> addresses = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +70,11 @@ public class AddActivity extends AppCompatActivity {
         } else {
             // Permission has already been granted
         }
-        editTemperature = findViewById(R.id.temperatureInput);
+        editTemperature = findViewById(R.id.testedit);
     }
 
     public void getLocation(View v) {
-
+        TextView locationTextView = findViewById(R.id.locationTextView);
         gpsTracker = new GPSTracker(AddActivity.this);
         if (gpsTracker.canGetLocation()) {
             // Create GPS Object
@@ -88,12 +88,16 @@ public class AddActivity extends AppCompatActivity {
         }
         // Show Position on textView
         try {
-            addresses = geocoder.getFromLocation(gpsTracker.getLatitude(), gpsTracker.getLongitude(), 1);
-        } catch (IOException ioException) {
+            List<Address> addresses = geocoder.getFromLocation(gpsTracker.getLatitude(), gpsTracker.getLongitude(), 1);
+            if (addresses != null) {
 
+                locationTextView.setText(addresses.get(0).getAddressLine(0));
+            } else {
+                locationTextView.setText("Address Not Found");
+            }
+        } catch (IOException ioException) {
+            Toast.makeText(this, "Geocoder error, GPS", Toast.LENGTH_SHORT).show();
         }
-        TextView locationTextView = findViewById(R.id.locationTextView);
-        locationTextView.setText(addresses.get(0).getAddressLine(0));
     }
 
     private String getTemperature() {
@@ -131,7 +135,7 @@ public class AddActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child(user.getUid()).child(Calendar.getInstance().getTime().toString()).setValue(weatherCrowdData);
 
-        Toast.makeText(this, "Data sent", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     @Override
