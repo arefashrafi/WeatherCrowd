@@ -83,7 +83,7 @@ public class HeatmapActivity extends AppCompatActivity {
 
     private void addTemperatureSource(@NonNull Style loadedMapStyle) {
         try {
-            loadedMapStyle.addSource(new GeoJsonSource(TEMPERATURE_SOURCE_ID, new URL(getString(R.string.firebase_temp_data_source))));
+            loadedMapStyle.addSource(new GeoJsonSource(TEMPERATURE_SOURCE_ID, new URL(getString(R.string.firebasetemp_data_source))));
         } catch (MalformedURLException malformedUrlException) {
             Timber.e(malformedUrlException, "That's not an url... ");
         }
