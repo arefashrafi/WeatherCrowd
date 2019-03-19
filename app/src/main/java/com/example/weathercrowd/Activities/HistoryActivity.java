@@ -99,7 +99,6 @@ public class HistoryActivity extends AppCompatActivity {
             Toast.makeText(this, "User is null", Toast.LENGTH_SHORT);
         }
         finish();
-
     }
 }
 

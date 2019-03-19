@@ -17,6 +17,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cocoahero.android.geojson.Feature;
+import com.cocoahero.android.geojson.Point;
 import com.example.weathercrowd.Misc.GPSTracker;
 import com.example.weathercrowd.Misc.WeatherCrowdData;
 import com.example.weathercrowd.R;
@@ -24,6 +26,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -117,7 +122,11 @@ public class AddActivity extends AppCompatActivity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            sendToDatabase();
+                            try {
+                                sendToDatabase();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
             builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -129,17 +138,22 @@ public class AddActivity extends AppCompatActivity {
             AlertDialog dialog = builder.create();
             dialog.show();
         }
-
     }
 
-    public void sendToDatabase() {
+    public void sendToDatabase() throws JSONException {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         // Send to DB
-        weatherCrowdData = new WeatherCrowdData(location, Double.parseDouble(getTemperature()));
+        //Create GeoJSON object
+        Point point = new Point(location.getLatitude(), location.getLongitude());
+        Feature feature = new Feature(point);
+        feature.setIdentifier(user.getUid());
+        JSONObject jsonObject = new JSONObject();
 
+        jsonObject.put("temp", Double.parseDouble(getTemperature()));
+        feature.setProperties(jsonObject);
+        JSONObject geoJSON = feature.toJSON();
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child(user.getUid()).child(Calendar.getInstance().getTime().toString()).setValue(weatherCrowdData);
-
+        mDatabase.child(user.getUid()).child(Calendar.getInstance().getTime().toString()).setValue(geoJSON.toString());
         finish();
     }
 

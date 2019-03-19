@@ -3,8 +3,19 @@ package com.example.weathercrowd.Activities;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
+import com.cocoahero.android.geojson.Feature;
+import com.cocoahero.android.geojson.Point;
 import com.example.weathercrowd.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.JsonObject;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -16,10 +27,8 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import timber.log.Timber;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity;
@@ -52,10 +61,33 @@ public class HeatmapActivity extends AppCompatActivity {
 
     private MapView mapView;
     private MapboxMap mapboxMap;
+    private FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference mDatabase;
+    private JsonObject jsonObject = new JsonObject();
+    private Feature feature;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(mUser.getUid());
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Log.w("TAG", postSnapshot.getValue().toString());
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w("TAG", "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        });
+
 
 // Mapbox access token is configured here. This needs to be called either in your application
 // object or in the same activity which contains the mapview.
@@ -71,7 +103,11 @@ public class HeatmapActivity extends AppCompatActivity {
                 mapboxMap.setStyle(Style.DARK, new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
-                        addTemperatureSource(style);
+                        try {
+                            addTemperatureSource(style);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         addHeatmapLayer(style);
                         addCircleLayer(style);
                         addTemperatureLayer(style);
@@ -81,20 +117,25 @@ public class HeatmapActivity extends AppCompatActivity {
         });
     }
 
-    private void addTemperatureSource(@NonNull Style loadedMapStyle) {
+    private void addTemperatureSource(@NonNull Style loadedMapStyle) throws JSONException {
+        feature = new Feature(new Point(-151.5129, 63.1016));
+        JSONObject jsontest = new JSONObject();
         try {
-            loadedMapStyle.addSource(new GeoJsonSource(TEMPERATURE_SOURCE_ID, new URL(getString(R.string.firebasetemp_data_source))));
-        } catch (MalformedURLException malformedUrlException) {
-            Timber.e(malformedUrlException, "That's not an url... ");
+            jsontest.put("temp", 4.1);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        feature.setProperties(jsontest);
+        JSONObject gedad = feature.toJSON();
+        loadedMapStyle.addSource(new GeoJsonSource(TEMPERATURE_SOURCE_ID, gedad.toString()));
     }
 
     private void addTemperatureLayer(@NonNull Style loadedMapStyle) {
 
         SymbolLayer symbolLayer = new SymbolLayer(TEMPERATURE_LAYER_ID, TEMPERATURE_SOURCE_ID);
         symbolLayer.withProperties(
-                PropertyFactory.textField(get("mag")),
-                PropertyFactory.textColor("white"),
+                PropertyFactory.textField(get("temp")),
+                PropertyFactory.textColor("red"),
                 PropertyFactory.textAllowOverlap(true)
         );
         symbolLayer.setProperties(
@@ -134,7 +175,7 @@ public class HeatmapActivity extends AppCompatActivity {
 // Increase the heatmap weight based on frequency and property magnitude
                 heatmapWeight(
                         interpolate(
-                                linear(), get("mag"),
+                                linear(), get("temp"),
                                 stop(0, 0),
                                 stop(6, 1)
                         )
@@ -181,12 +222,12 @@ public class HeatmapActivity extends AppCompatActivity {
                         interpolate(
                                 linear(), zoom(),
                                 literal(7), interpolate(
-                                        linear(), get("mag"),
+                                        linear(), get("temp"),
                                         stop(1, 1),
                                         stop(6, 4)
                                 ),
                                 literal(16), interpolate(
-                                        linear(), get("mag"),
+                                        linear(), get("temp"),
                                         stop(1, 5),
                                         stop(6, 50)
                                 )
@@ -196,7 +237,7 @@ public class HeatmapActivity extends AppCompatActivity {
 // Color circle by earthquake magnitude
                 circleColor(
                         interpolate(
-                                linear(), get("mag"),
+                                linear(), get("temp"),
                                 literal(1), rgba(33, 102, 172, 0),
                                 literal(2), rgb(103, 169, 207),
                                 literal(3), rgb(209, 229, 240),
