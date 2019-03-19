@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
             android:hint="@string/enter_temperature"
-            android:inputType="number" />
+            android:inputType="numberDecimal" />
 
     </android.support.design.widget.TextInputLayout>
 

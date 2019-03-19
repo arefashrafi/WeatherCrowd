@@ -43,6 +43,7 @@ public class HistoryActivity extends AppCompatActivity {
                     Log.w("TAG", postSnapshot.getKey());
                     dataList.add(postSnapshot.getKey());
                 }
+                setupListView();
             }
 
             @Override
@@ -52,7 +53,6 @@ public class HistoryActivity extends AppCompatActivity {
                 // ...
             }
         });
-        setupListView();
     }
 
     private void setupListView() {
