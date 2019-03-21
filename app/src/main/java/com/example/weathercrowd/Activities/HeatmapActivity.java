@@ -4,18 +4,19 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.CalendarView;
+import android.widget.CompoundButton;
+import android.widget.ToggleButton;
 
-import com.cocoahero.android.geojson.Feature;
-import com.cocoahero.android.geojson.Point;
 import com.example.weathercrowd.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.JsonObject;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -30,6 +31,10 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
@@ -42,8 +47,6 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeWidth;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity;
@@ -61,22 +64,66 @@ public class HeatmapActivity extends AppCompatActivity {
 
     private MapView mapView;
     private MapboxMap mapboxMap;
-    private FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
-    private DatabaseReference mDatabase;
-    private JsonObject jsonObject = new JsonObject();
-    private Feature feature;
-
+    private List<Feature> features = new ArrayList<>();
+    private CalendarView calendarView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Mapbox access token is configured here. This needs to be called either in your application
+        // object or in the same activity which contains the mapview.
+        Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
+        setContentView(R.layout.activity_heat_map_view);
+        calendarView = findViewById(R.id.calendarView);
+        mapView = findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                HeatmapActivity.this.mapboxMap = mapboxMap;
+                mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+                    @Override
+                    public void onStyleLoaded(@NonNull Style style) {
+                        addTemperatureSource(style);
+                        addHeatmapLayer(style);
+                        addCircleLayer(style);
+                        addTemperatureLayer(style);
+                    }
+                });
+            }
+        });
+    }
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(mUser.getUid());
-        databaseReference.addValueEventListener(new ValueEventListener() {
+    public void changeSourceDate(View view) {
+        ToggleButton toggle = findViewById(R.id.toggleButtonCalendar);
+
+        calendarView.setDate(new Date().getTime());
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                    calendarView.setVisibility(View.VISIBLE);
+                } else {
+                    // The toggle is disabled
+                    calendarView.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void addTemperatureSource(@NonNull Style loadedMapStyle) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    Log.w("TAG", postSnapshot.getValue().toString());
-
+                    for (DataSnapshot postSnapshotChild : postSnapshot.getChildren()) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(postSnapshotChild.getValue().toString());
+                            features.add(Feature.fromJson(jsonObject.toString()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
 
@@ -87,47 +134,8 @@ public class HeatmapActivity extends AppCompatActivity {
                 // ...
             }
         });
-
-
-// Mapbox access token is configured here. This needs to be called either in your application
-// object or in the same activity which contains the mapview.
-        Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
-
-        setContentView(R.layout.activity_heat_map_view);
-        mapView = findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                HeatmapActivity.this.mapboxMap = mapboxMap;
-                mapboxMap.setStyle(Style.DARK, new Style.OnStyleLoaded() {
-                    @Override
-                    public void onStyleLoaded(@NonNull Style style) {
-                        try {
-                            addTemperatureSource(style);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        addHeatmapLayer(style);
-                        addCircleLayer(style);
-                        addTemperatureLayer(style);
-                    }
-                });
-            }
-        });
-    }
-
-    private void addTemperatureSource(@NonNull Style loadedMapStyle) throws JSONException {
-        feature = new Feature(new Point(-151.5129, 63.1016));
-        JSONObject jsontest = new JSONObject();
-        try {
-            jsontest.put("temp", 4.1);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        feature.setProperties(jsontest);
-        JSONObject gedad = feature.toJSON();
-        loadedMapStyle.addSource(new GeoJsonSource(TEMPERATURE_SOURCE_ID, gedad.toString()));
+        FeatureCollection featureCollection = FeatureCollection.fromFeatures(features);
+        loadedMapStyle.addSource(new GeoJsonSource(TEMPERATURE_SOURCE_ID, featureCollection));
     }
 
     private void addTemperatureLayer(@NonNull Style loadedMapStyle) {
@@ -254,9 +262,9 @@ public class HeatmapActivity extends AppCompatActivity {
                                 stop(7, 0),
                                 stop(8, 1)
                         )
-                ),
-                circleStrokeColor("white"),
-                circleStrokeWidth(1.0f)
+                )
+                //circleStrokeColor("white"),
+                //circleStrokeWidth(1.0f)
         );
 
         loadedMapStyle.addLayerBelow(circleLayer, HEATMAP_LAYER_ID);

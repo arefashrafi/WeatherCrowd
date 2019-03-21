@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.cocoahero.android.geojson.Feature;
 import com.cocoahero.android.geojson.Point;
 import com.example.weathercrowd.Misc.GPSTracker;
-import com.example.weathercrowd.Misc.WeatherCrowdData;
 import com.example.weathercrowd.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,10 +39,9 @@ public class AddActivity extends AppCompatActivity {
     GPSTracker gpsTracker;
     Geocoder geocoder;
     Location location = new Location("");
-    WeatherCrowdData weatherCrowdData;
     private DatabaseReference mDatabase;
     EditText editTemperature;
-
+    private JSONObject tempJSON = new JSONObject();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,18 +141,11 @@ public class AddActivity extends AppCompatActivity {
     public void sendToDatabase() throws JSONException {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         // Send to DB
-        //Create GeoJSON object
-        Point point = new Point(location.getLatitude(), location.getLongitude());
-        Feature feature = new Feature(point);
-        feature.setIdentifier(user.getUid());
-        JSONObject jsonObject = new JSONObject();
-
-        jsonObject.put("temp", Double.parseDouble(getTemperature()));
-        feature.setProperties(jsonObject);
-        JSONObject geoJSON = feature.toJSON();
+        Feature feature = new Feature(new Point(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
+        tempJSON.put("temp", Double.parseDouble(getTemperature()));
+        feature.setProperties(tempJSON);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child(user.getUid()).child(Calendar.getInstance().getTime().toString()).setValue(geoJSON.toString());
-        finish();
+        mDatabase.child(user.getUid()).child(Calendar.getInstance().getTime().toString()).setValue(feature.toJSON().toString());
     }
 
     @Override

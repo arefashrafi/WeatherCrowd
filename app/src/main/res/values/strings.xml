@@ -14,4 +14,7 @@
     <string name="welcome_to_weather_crowd">Welcome To Weather Crowd</string>
     <string name="sign_in_main">Sign In</string>
     <string name="historyMenuText">History</string>
+    <string name="timeButton_Map">Date</string>
+    <string name="togglebuttonDate">ToggleButton</string>
+    <string name="date">Date</string>
 </resources>

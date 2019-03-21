@@ -2,4 +2,21 @@
 <com.mapbox.mapboxsdk.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:id="@+id/mapView"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent">
+
+    <ToggleButton
+        android:id="@+id/toggleButtonCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:onClick="changeSourceDate"
+        android:text="@string/togglebuttonDate"
+        android:visibility="visible" />
+
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="432dp"
+        android:layout_height="301dp"
+        android:visibility="visible" />
+
+</com.mapbox.mapboxsdk.maps.MapView>
