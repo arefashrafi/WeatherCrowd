@@ -95,7 +95,6 @@ public class HeatmapActivity extends AppCompatActivity {
 
     public void changeSourceDate(View view) {
         ToggleButton toggle = findViewById(R.id.toggleButtonCalendar);
-
         calendarView.setDate(new Date().getTime());
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
