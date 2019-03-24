@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -49,6 +50,7 @@ public class AddActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add);
 
         geocoder = new Geocoder(this, Locale.getDefault());
+        // CHECK FOR PERMISSION
 // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -100,7 +102,7 @@ public class AddActivity extends AppCompatActivity {
                 locationTextView.setText("Address Not Found");
             }
         } catch (IOException ioException) {
-            Toast.makeText(this, "Geocoder error, GPS", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Cant find address, GPS", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -140,12 +142,11 @@ public class AddActivity extends AppCompatActivity {
 
     public void sendToDatabase() throws JSONException {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        // Send to DB
         Feature feature = new Feature(new Point(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
         tempJSON.put("temp", Double.parseDouble(getTemperature()));
         feature.setProperties(tempJSON);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child(user.getUid()).child(Calendar.getInstance().getTime().toString()).setValue(feature.toJSON().toString());
+        mDatabase.child(user.getUid()).child(new Date().toString()).setValue(feature.toJSON().toString());
     }
 
     @Override

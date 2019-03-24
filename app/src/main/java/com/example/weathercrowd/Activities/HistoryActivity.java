@@ -73,7 +73,7 @@ public class HistoryActivity extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                deleteChoosenObject(dataList.get(position));
+                                deleteTemperatureObject(dataList.get(position));
                                 finish();
                             }
                         });
@@ -90,7 +90,7 @@ public class HistoryActivity extends AppCompatActivity {
         });
     }
 
-    private void deleteChoosenObject(String weatherDataKey) {
+    private void deleteTemperatureObject(String weatherDataKey) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             mDatabase = FirebaseDatabase.getInstance().getReference();

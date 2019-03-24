@@ -18,6 +18,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 1;
 
+    // Pre generate code from google example, used to create a sign in view
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +34,7 @@ public class SignInActivity extends AppCompatActivity {
                 RC_SIGN_IN);
     }
 
+    // OnActivityResult will start Menu Activity if sign in process is successful
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

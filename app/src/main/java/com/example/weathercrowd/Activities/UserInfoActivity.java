@@ -26,6 +26,7 @@ public class UserInfoActivity extends AppCompatActivity {
         fillUserData();
     }
 
+    // Function used to fill the view with data
     private void fillUserData() {
         user = FirebaseAuth.getInstance().getCurrentUser();
         TextView textUser = findViewById(R.id.textUser);
@@ -41,6 +42,7 @@ public class UserInfoActivity extends AppCompatActivity {
         new DownloadImageTask((ImageView) findViewById(R.id.imageView)).execute(user.getPhotoUrl().toString());
     }
 
+    // Sign out and return to main activity
     public void SignOutUser(View v) {
         AuthUI.getInstance()
                 .signOut(this)

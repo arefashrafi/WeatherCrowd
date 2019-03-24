@@ -8,6 +8,7 @@ import android.view.View;
 import com.example.weathercrowd.R;
 
 public class MainActivity extends AppCompatActivity {
+    // MainActivity for main view when starting application
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

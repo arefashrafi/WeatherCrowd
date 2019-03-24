@@ -9,6 +9,8 @@ import com.example.weathercrowd.R;
 
 public class MenuActivity extends AppCompatActivity {
 
+
+    // Code is self explanatory
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

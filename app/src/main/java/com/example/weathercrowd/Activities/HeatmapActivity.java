@@ -1,14 +1,17 @@
 package com.example.weathercrowd.Activities;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.CalendarView;
 import android.widget.CompoundButton;
-import android.widget.ToggleButton;
+import android.widget.Switch;
 
+import com.example.weathercrowd.Misc.GPSTracker;
 import com.example.weathercrowd.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -18,6 +21,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -31,6 +37,8 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,11 +69,14 @@ public class HeatmapActivity extends AppCompatActivity {
     private static final String HEATMAP_LAYER_SOURCE = "temperatures";
     private static final String CIRCLE_LAYER_ID = "temperatures-circle";
     private static final String TEMPERATURE_LAYER_ID = "temperature";
-
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private MapView mapView;
     private MapboxMap mapboxMap;
-    private List<Feature> features = new ArrayList<>();
-    private CalendarView calendarView;
+    private Switch switchDate;
+    private GPSTracker gpsTracker = new GPSTracker(this);
+    private CameraPosition cameraPosition;
+    private Style loadedMapStyle;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,12 +84,26 @@ public class HeatmapActivity extends AppCompatActivity {
         // object or in the same activity which contains the mapview.
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
         setContentView(R.layout.activity_heat_map_view);
-        calendarView = findViewById(R.id.calendarView);
+        switchDate = findViewById(R.id.switchDate);
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                runPermissionCheck();
+                if (gpsTracker.canGetLocation()) {
+                    cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()))
+                            .zoom(0)
+                            .build();
+                } else {
+                    cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(0, 0))
+                            .zoom(0)
+                            .build();
+                }
+
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 3000);
                 HeatmapActivity.this.mapboxMap = mapboxMap;
                 mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
                     @Override
@@ -91,39 +116,50 @@ public class HeatmapActivity extends AppCompatActivity {
                 });
             }
         });
-    }
-
-    public void changeSourceDate(View view) {
-        ToggleButton toggle = findViewById(R.id.toggleButtonCalendar);
-        calendarView.setDate(new Date().getTime());
-        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        switchDate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    // The toggle is enabled
-                    calendarView.setVisibility(View.VISIBLE);
-                } else {
-                    // The toggle is disabled
-                    calendarView.setVisibility(View.GONE);
+                    addTemperatureSource(loadedMapStyle);
                 }
             }
         });
     }
 
-    private void addTemperatureSource(@NonNull Style loadedMapStyle) {
+    private void runPermissionCheck() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+        }
+    }
+
+    private void readValuesFromFirebase(final OnGetDataListener listener) {
+        listener.onStart();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    for (DataSnapshot postSnapshotChild : postSnapshot.getChildren()) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(postSnapshotChild.getValue().toString());
-                            features.add(Feature.fromJson(jsonObject.toString()));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+                listener.onSuccess(dataSnapshot);
             }
 
             @Override
@@ -133,34 +169,70 @@ public class HeatmapActivity extends AppCompatActivity {
                 // ...
             }
         });
-        FeatureCollection featureCollection = FeatureCollection.fromFeatures(features);
-        loadedMapStyle.addSource(new GeoJsonSource(TEMPERATURE_SOURCE_ID, featureCollection));
     }
 
-    private void addTemperatureLayer(@NonNull Style loadedMapStyle) {
+    private void addTemperatureSource(@NonNull final Style loadedMapStyle) {
+        this.loadedMapStyle = loadedMapStyle;
+        readValuesFromFirebase(new OnGetDataListener() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
 
-        SymbolLayer symbolLayer = new SymbolLayer(TEMPERATURE_LAYER_ID, TEMPERATURE_SOURCE_ID);
-        symbolLayer.withProperties(
-                PropertyFactory.textField(get("temp")),
-                PropertyFactory.textColor("red"),
-                PropertyFactory.textAllowOverlap(true)
-        );
-        symbolLayer.setProperties(
-                textOpacity(
-                        interpolate(
-                                linear(), zoom(),
-                                stop(2, 0),
-                                stop(5, 1)
-                        )
-                )
+                List<Feature> features = new ArrayList<>();
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
-        );
-        loadedMapStyle.addLayer(symbolLayer);
+                    for (DataSnapshot postSnapshotChild : postSnapshot.getChildren()) {
+                        try {
+                            if (dateTimeComparer(postSnapshotChild.getKey()) == true && !switchDate.isChecked()) {
+                                JSONObject jsonObject = new JSONObject(postSnapshotChild.getValue().toString());
+                                features.add(Feature.fromJson(jsonObject.toString()));
+                            } else {
+                                JSONObject jsonObject = new JSONObject(postSnapshotChild.getValue().toString());
+                                features.add(Feature.fromJson(jsonObject.toString()));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                addStyleToTemperatureSource(FeatureCollection.fromFeatures(features));
+            }
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+
+    }
+
+    private boolean dateTimeComparer(String key) throws ParseException {
+        Date dateKey = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy").parse(key);
+        Date nowDate = new Date();
+        String dateKeyString = new SimpleDateFormat("yyyy-MM-dd").format(dateKey);
+        String calendarDateString = new SimpleDateFormat("yyyy-MM-dd").format(nowDate);
+
+        if (dateKeyString.contains(calendarDateString) == true) {
+            Log.d("TAG", "CALENDAR :TRUE");
+            return true;
+        }
+        Log.d("TAG", "CALENDAR:FALSE");
+        return false;
+    }
+
+    private void addStyleToTemperatureSource(FeatureCollection featureCollection) {
+        loadedMapStyle.addSource(new GeoJsonSource(TEMPERATURE_SOURCE_ID, featureCollection));
     }
 
     private void addHeatmapLayer(@NonNull Style loadedMapStyle) {
         HeatmapLayer layer = new HeatmapLayer(HEATMAP_LAYER_ID, TEMPERATURE_SOURCE_ID);
-        layer.setMaxZoom(9);
+        layer.setMaxZoom(14);
         layer.setSourceLayer(HEATMAP_LAYER_SOURCE);
         layer.setProperties(
 
@@ -220,6 +292,36 @@ public class HeatmapActivity extends AppCompatActivity {
         loadedMapStyle.addLayerAbove(layer, "waterway-label");
     }
 
+    private void addTemperatureLayer(@NonNull Style loadedMapStyle) {
+
+        SymbolLayer symbolLayer = new SymbolLayer(TEMPERATURE_LAYER_ID, TEMPERATURE_SOURCE_ID);
+        symbolLayer.withProperties(
+                PropertyFactory.textField(get("temp")),
+                PropertyFactory.textColor("red"),
+                PropertyFactory.textAllowOverlap(true)
+        );
+        symbolLayer.setProperties(
+                textOpacity(
+                        interpolate(
+                                linear(), zoom(),
+                                stop(2, 0),
+                                stop(5, 1)
+                        )
+                )
+
+        );
+        loadedMapStyle.addLayer(symbolLayer);
+    }
+
+    public interface OnGetDataListener {
+        //make new interface for call back
+        void onSuccess(DataSnapshot dataSnapshot);
+
+        void onStart();
+
+        void onFailure();
+    }
+
     private void addCircleLayer(@NonNull Style loadedMapStyle) {
         CircleLayer circleLayer = new CircleLayer(CIRCLE_LAYER_ID, TEMPERATURE_SOURCE_ID);
         circleLayer.setProperties(
@@ -268,6 +370,7 @@ public class HeatmapActivity extends AppCompatActivity {
 
         loadedMapStyle.addLayerBelow(circleLayer, HEATMAP_LAYER_ID);
     }
+
 
     @Override
     protected void onStart() {

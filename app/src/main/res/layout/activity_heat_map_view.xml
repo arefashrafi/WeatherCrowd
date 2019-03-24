@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.mapbox.mapboxsdk.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:layout_width="match_parent"
-    android:id="@+id/mapView"
     android:layout_height="match_parent">
 
-    <ToggleButton
-        android:id="@+id/toggleButtonCalendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="true"
-        android:onClick="changeSourceDate"
-        android:text="@string/togglebuttonDate"
-        android:visibility="visible" />
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <CalendarView
-        android:id="@+id/calendarView"
-        android:layout_width="432dp"
-        android:layout_height="301dp"
-        android:visibility="visible" />
-
-</com.mapbox.mapboxsdk.maps.MapView>
+        <Switch
+            android:id="@+id/switchDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All" />
+    </com.mapbox.mapboxsdk.maps.MapView>
+</android.support.constraint.ConstraintLayout>

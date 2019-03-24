@@ -89,19 +89,13 @@ public class GPSTracker extends Service implements LocationListener {
         return location;
     }
 
-    /**
-     * Stop using GPS listener
-     * Calling this function will stop using GPS in your app
-     */
+
     public void stopUsingGPS() {
         if (locationManager != null) {
             locationManager.removeUpdates(GPSTracker.this);
         }
     }
 
-    /**
-     * Function to get latitude
-     */
     public double getLatitude() {
         if (location != null) {
             latitude = location.getLatitude();
@@ -110,9 +104,6 @@ public class GPSTracker extends Service implements LocationListener {
         return latitude;
     }
 
-    /**
-     * Function to get longitude
-     */
     public double getLongitude() {
         if (location != null) {
             longitude = location.getLongitude();
@@ -121,19 +112,11 @@ public class GPSTracker extends Service implements LocationListener {
         return longitude;
     }
 
-    /**
-     * Function to check GPS/wifi enabled
-     *
-     * @return boolean
-     */
+
     public boolean canGetLocation() {
         return this.canGetLocation;
     }
 
-    /**
-     * Function to show settings alert dialog
-     * On pressing Settings button will lauch Settings Options
-     */
     public void showSettingsAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
         // Setting Dialog Title
